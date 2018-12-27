@@ -15,3 +15,11 @@ This project is an experiment to see whether we can deploy headless chrome in ou
   - [ ] Exams
   - [ ] Grades
 
+## Usage
+### Setup
+```sh
+$ npm i
+$ npm run build
+```
+### Config
+- add credenitals to `config.sample.json` and rename the file to `config.json`, this is for debugging until a web api is developed
