@@ -14,6 +14,7 @@ This project is an experiment to see whether we can deploy headless chrome in ou
   - [ ] Courses
   - [ ] Exams
   - [ ] Grades
+- [ ] Benchmarks vs current crawler
 
 ## Usage
 ### Setup
