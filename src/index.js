@@ -7,10 +7,13 @@ import config from '../config.json'
  */
 async function main () {
   try {
-    const browser = await puppeteer.launch({ devtools: true })
-    const page = await browser.newPage()
+    const browser = await puppeteer.launch({ devtools: process.env.NODE_ENV === 'development' })
+    await (await browser.pages())[0].close() // close default about:blank page
+    const context = await browser.createIncognitoBrowserContext()
+    const page = await context.newPage()
     await crawler.login(page, config.username, config.password)
     console.log(await crawler.getStudentProgramInfo(page))
+    await context.close()
     await browser.close()
   } catch (e) {
     console.error(e)
