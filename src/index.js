@@ -13,8 +13,8 @@ async function main () {
     const context = await browser.createIncognitoBrowserContext()
     const page = await context.newPage()
     await crawler.login(page, config.username, config.password)
-    const html = await crawler.getStudentProgramInfo(page)
-    console.log(parser.parseStudentProgramInfo(html))
+    const htmls = await crawler.getGrades(page)
+    console.log(JSON.stringify(htmls.map(html => parser.parseGrades(html)), null, '\t'))
     await context.close()
     await browser.close()
   } catch (e) {
