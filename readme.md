@@ -29,7 +29,7 @@ $ npm i
 $ npm run dev
 ```
 ### Web API
-#### Endpoint /:scope
+#### GET /:scope
 - pass list of required data scopes separated by comma, e.g. `/grades,program_info`
 - valid scopes: `grades`, `program_info`
 #### Auth
