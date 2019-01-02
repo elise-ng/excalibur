@@ -8,12 +8,15 @@ This project is an experiment to see whether we can deploy headless chrome in ou
   - [x] Login
   - [ ] Courses
   - [ ] Exams
-  - [ ] Grades
+  - [x] Grades
 - [ ] Data Parsing and Web API
   - [ ] Login
   - [ ] Courses
   - [ ] Exams
   - [ ] Grades
+- [ ] Quality of Life
+  - [ ] Cookie forwarding
+  - [ ] 2FA remember me
 - [ ] Benchmarks vs current crawler
 
 ## Usage
