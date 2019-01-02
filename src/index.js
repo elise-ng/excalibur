@@ -5,6 +5,7 @@ import config from '../config.json'
 const URL_SIS_LOGIN = 'https://sisprod.psft.ust.hk/psp/SISPROD/EMPLOYEE/HRMS/c/SA_LEARNER_SERVICES.SSS_STUDENT_CENTER.GBL?pslnkid=Z_HC_SSS_STUDENT_CENTER_LNK&FolderPath=PORTAL_ROOT_OBJECT.Z_HC_SSS_STUDENT_CENTER_LNK&IsFolder=false&IgnoreParamTempl=FolderPath%2cIsFolder'
 const URL_SIS_HOME = 'https://sisprod.psft.ust.hk/psc/SISPROD/EMPLOYEE/HRMS/c/SA_LEARNER_SERVICES.SSS_STUDENT_CENTER.GBL?pslnkid=Z_HC_SSS_STUDENT_CENTER_LNK&FolderPath=PORTAL_ROOT_OBJECT.Z_HC_SSS_STUDENT_CENTER_LNK&IsFolder=false&IgnoreParamTempl=FolderPath%2cIsFolder&PortalActualURL=https%3a%2f%2fsisprod.psft.ust.hk%2fpsc%2fSISPROD%2fEMPLOYEE%2fHRMS%2fc%2fSA_LEARNER_SERVICES.SSS_STUDENT_CENTER.GBL%3fpslnkid%3dZ_HC_SSS_STUDENT_CENTER_LNK&PortalContentURL=https%3a%2f%2fsisprod.psft.ust.hk%2fpsc%2fSISPROD%2fEMPLOYEE%2fHRMS%2fc%2fSA_LEARNER_SERVICES.SSS_STUDENT_CENTER.GBL%3fpslnkid%3dZ_HC_SSS_STUDENT_CENTER_LNK&PortalContentProvider=HRMS&PortalCRefLabel=Student%20Center&PortalRegistryName=EMPLOYEE&PortalServletURI=https%3a%2f%2fsisprod.psft.ust.hk%2fpsp%2fSISPROD%2f&PortalURI=https%3a%2f%2fsisprod.psft.ust.hk%2fpsc%2fSISPROD%2f&PortalHostNode=HRMS&NoCrumbs=yes'
 const URL_SIS_GRADES = 'https://sisprod.psft.ust.hk/psc/SISPROD/EMPLOYEE/HRMS/c/SA_LEARNER_SERVICES.SSR_SSENRL_GRADE.GBL'
+const URL_STU_PROG_INFO = 'https://w5.ab.ust.hk/jsga/graduation'
 const TIMEOUT_2FA = 3 * 60 * 1000
 
 /**
@@ -67,6 +68,20 @@ async function getGrades (page) {
 }
 
 /**
+ * Student Program Info Crawling Routine
+ * @param {puppeteer.Page} page
+ * @returns {string} html string
+ */
+async function getStudentProgramInfo (page) {
+  try {
+    await Promise.all([page.goto(URL_STU_PROG_INFO), page.waitFor('div[class="panel panel-default"]')])
+    return await page.content()
+  } catch (e) {
+    throw e
+  }
+}
+
+/**
  * Async Entrypoint
  */
 async function main () {
@@ -74,8 +89,7 @@ async function main () {
     const browser = await puppeteer.launch({ devtools: true })
     const page = await browser.newPage()
     await login(page, config.username, config.password)
-    const gradePages = await getGrades(page)
-    console.log(JSON.stringify(gradePages, null, '\t'))
+    console.log(await getStudentProgramInfo(page))
     await browser.close()
   } catch (e) {
     console.error(e)
