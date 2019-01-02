@@ -31,6 +31,16 @@ app.get('/:scopes', async (req, res) => {
     const browser = await puppeteer.launch({ devtools: IS_DEVELOPMENT })
     const page = (await browser.pages())[0]
 
+    // close browser when connection close
+    req.on('close', async () => {
+      try {
+        if (page) { await page.deleteCookie() }
+        if (browser) { await browser.close() }
+      } catch (e) {
+        console.error(e.stack)
+      }
+    })
+
     // login
     let cookies = []
     try { cookies = JSON.parse(req.cookies.forwardedCookies) } catch (e) { }
@@ -54,7 +64,8 @@ app.get('/:scopes', async (req, res) => {
     // deliver payload
     res.status(200).json(payload)
 
-    // close browser
+    // clear cookie and close browser
+    await page.deleteCookie()
     await browser.close()
   } catch (e) {
     if (e instanceof HttpError.HttpError) {
