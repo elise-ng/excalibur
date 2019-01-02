@@ -1,5 +1,6 @@
 import puppeteer from 'puppeteer'
 import * as crawler from './crawler'
+import * as parser from './parser'
 import config from '../config.json'
 
 /**
@@ -12,7 +13,8 @@ async function main () {
     const context = await browser.createIncognitoBrowserContext()
     const page = await context.newPage()
     await crawler.login(page, config.username, config.password)
-    console.log(await crawler.getStudentProgramInfo(page))
+    const html = await crawler.getStudentProgramInfo(page)
+    console.log(parser.parseStudentProgramInfo(html))
     await context.close()
     await browser.close()
   } catch (e) {
