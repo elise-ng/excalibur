@@ -15,7 +15,7 @@ const TIMEOUT_2FA = 3 * 60 * 1000
  */
 async function login (page, username, password) {
   try {
-    await Promise.all([page.waitFor('#fm1'), page.goto(URL_SIS_LOGIN)])
+    await Promise.all([page.goto(URL_SIS_LOGIN), page.waitFor('#fm1')])
     await page.focus('#userNameInput')
     await page.keyboard.type(username)
     await page.focus('#passwordInput')
@@ -34,13 +34,18 @@ async function login (page, username, password) {
  * @returns {string[]} html strings of grade pages
  */
 async function getGrades (page) {
+  const SELECTOR_TERM_TABLE = 'table[id="SSR_DUMMY_RECV1$scroll$0"]'
+  const SELECTOR_GRADE_TABLE = 'table[id="TERM_CLASSES$scroll$0"]'
+  const SELECTOR_CHANGE_TERM_BUTTON = '#DERIVED_SSS_SCT_SSS_TERM_LINK'
+  const SELECTOR_TERM_INPUT = 'input[name="SSR_DUMMY_RECV1$sels$0"]'
+  const SELECTOR_CONTINUE_BUTTON = '#DERIVED_SSS_SCT_SSR_PB_GO'
   try {
-    await Promise.all([Promise.race([page.waitFor('table[id="SSR_DUMMY_RECV1$scroll$0"]'), page.waitFor('table[id="TERM_CLASSES$scroll$0"]')]), page.goto(URL_SIS_GRADES)])
-    if (await page.$('table[id="SSR_DUMMY_RECV1$scroll$0"]') === null) {
-      // not landed on term list
-      if (await page.$('#DERIVED_SSS_SCT_SSS_TERM_LINK') !== null) {
+    await Promise.all([page.goto(URL_SIS_GRADES), Promise.race([page.waitFor(SELECTOR_TERM_TABLE), page.waitFor(SELECTOR_GRADE_TABLE)])])
+    if (await page.$(SELECTOR_TERM_TABLE) === null) {
+      // landed on current term result
+      if (await page.$(SELECTOR_CHANGE_TERM_BUTTON) !== null) {
         // change term button available => go to term list
-        await Promise.all([page.click('#DERIVED_SSS_SCT_SSS_TERM_LINK'), page.waitForNavigation()])
+        await Promise.all([page.click(SELECTOR_CHANGE_TERM_BUTTON), page.waitForNavigation()])
       } else {
         // change term button unavailable (year 1 fall sem special case) => return current sem only
         return [await page.content()]
@@ -48,16 +53,12 @@ async function getGrades (page) {
     }
     // main routine: loop through each term
     let results = []
-    // read term list
-    const numOfTerms = await page.$$eval('input[name="SSR_DUMMY_RECV1$sels$0"]', elems => elems.length)
+    const numOfTerms = await page.$$eval(SELECTOR_TERM_INPUT, elems => elems.length)
     for (const termId of _.range(0, numOfTerms)) {
-      // select term
-      await page.click(`input[name="SSR_DUMMY_RECV1$sels$0"][value="${termId}"]`)
-      await Promise.all([page.click('#DERIVED_SSS_SCT_SSR_PB_GO'), page.waitForNavigation()])
-      // save html for term result
+      await page.click(`${SELECTOR_TERM_INPUT}[value="${termId}"]`)
+      await Promise.all([page.click(SELECTOR_CONTINUE_BUTTON), page.waitForNavigation()])
       results.push(await page.content())
-      // click change term and return to term list
-      await Promise.all([page.click('#DERIVED_SSS_SCT_SSS_TERM_LINK'), page.waitForNavigation()])
+      await Promise.all([page.click(SELECTOR_CHANGE_TERM_BUTTON), page.waitForNavigation()])
     }
     return results
   } catch (e) {
