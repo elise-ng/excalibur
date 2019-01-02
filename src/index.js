@@ -31,10 +31,22 @@ async function login (page, username, password) {
 /**
  * SIS Grades Crawling Routine
  * @param {puppeteer.Page} page
+ * @returns {string[]} html strings of grade pages
  */
 async function getGrades (page) {
   try {
-    await Promise.all([page.waitFor('.PSLEVEL2GRIDWBO'), page.goto(URL_SIS_GRADES)])
+    await Promise.all([Promise.race([page.waitFor('table[id="SSR_DUMMY_RECV1$scroll$0"]'), page.waitFor('table[id="TERM_CLASSES$scroll$0"]')]), page.goto(URL_SIS_GRADES)])
+    if (await page.$('table[id="SSR_DUMMY_RECV1$scroll$0"]') === null) {
+      // not landed on term list
+      if (await page.$('#DERIVED_SSS_SCT_SSS_TERM_LINK') !== null) {
+        // change term button available => go to term list
+        await Promise.all([page.click('#DERIVED_SSS_SCT_SSS_TERM_LINK'), page.waitForNavigation()])
+      } else {
+        // change term button unavailable (year 1 fall sem special case) => return current sem only
+        return [await page.content()]
+      }
+    }
+    // main routine: loop through each term
     let results = []
     // read term list
     const numOfTerms = await page.$$eval('input[name="SSR_DUMMY_RECV1$sels$0"]', elems => elems.length)
