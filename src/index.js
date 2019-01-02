@@ -2,10 +2,16 @@ import express from 'express'
 import puppeteer from 'puppeteer'
 import HttpError from 'http-errors'
 import auth from 'basic-auth'
+import cookieParser from 'cookie-parser'
 import * as crawler from './crawler'
 import * as parser from './parser'
 
+const IS_DEVELOPMENT = process.env.NODE_ENV === 'development'
+const COOKIE_EXPIRE_DAYS = 14
+
 const app = express()
+
+app.use(cookieParser())
 
 app.get('/:scopes', async (req, res) => {
   try {
@@ -21,14 +27,20 @@ app.get('/:scopes', async (req, res) => {
     const scopes = req.params.scopes.split(',').filter(scope => validScopes.includes(scope))
     if (scopes.length <= 0) { throw new HttpError(400, 'scopes invalid or empty') }
 
-    // init context and page
-    const browser = await puppeteer.launch({ devtools: process.env.NODE_ENV === 'development' })
-    await (await browser.pages())[0].close() // close default about:blank page
-    const context = await browser.createIncognitoBrowserContext()
-    const page = await context.newPage()
+    // launch browser
+    const browser = await puppeteer.launch({ devtools: IS_DEVELOPMENT })
+    const page = (await browser.pages())[0]
 
     // login
-    await crawler.login(page, user.name, user.pass)
+    let cookies = []
+    try { cookies = JSON.parse(req.cookies.forwardedCookies) } catch (e) { }
+    cookies = await crawler.login(page, user.name, user.pass, cookies)
+    const expireDate = new Date()
+    expireDate.setDate(expireDate.getDate() + COOKIE_EXPIRE_DAYS)
+    res.cookie('forwardedCookies', JSON.stringify(cookies), {
+      expires: expireDate,
+      secure: !IS_DEVELOPMENT
+    })
 
     // handle scopes
     let payload = { success: true }
@@ -42,8 +54,8 @@ app.get('/:scopes', async (req, res) => {
     // deliver payload
     res.status(200).json(payload)
 
-    // destroy context and page
-    await context.close()
+    // close browser
+    await browser.close()
   } catch (e) {
     if (e instanceof HttpError.HttpError) {
       res.status(e.status).json({
