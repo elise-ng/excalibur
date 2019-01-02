@@ -9,11 +9,13 @@ This project is an experiment to see whether we can deploy headless chrome in ou
   - [ ] Courses
   - [ ] Exams
   - [x] Grades
+  - [ ] Program Information
 - [ ] Data Parsing and Web API
   - [ ] Login
   - [ ] Courses
   - [ ] Exams
   - [ ] Grades
+  - [ ] Program Information
 - [ ] Quality of Life
   - [ ] Cookie forwarding
   - [ ] 2FA remember me
