@@ -9,7 +9,7 @@ This project is an experiment to see whether we can deploy headless chrome in ou
   - [ ] Courses
   - [ ] Exams
   - [x] Grades
-  - [ ] Program Information
+  - [x] Program Information
 - [ ] Data Parsing and Web API
   - [x] Login
   - [ ] Courses
@@ -17,7 +17,7 @@ This project is an experiment to see whether we can deploy headless chrome in ou
   - [x] Grades
   - [x] Program Information
 - [ ] Quality of Life
-  - [ ] Cookie forwarding: working except cas cookie expires after session
+  - [ ] Cookie forwarding: working except cas cookie expires after session, so program info breaks (probably should use 2fa cookie to speed up like in old code)
   - [ ] 2FA remember me: somehow can't tick the box on chrome, investigation needed
 - [ ] Benchmarks vs current crawler
 - [ ] CLI Interface
