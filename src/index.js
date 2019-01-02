@@ -6,10 +6,10 @@ const URL_SIS_HOMEPAGE_FRAME = 'https://sisprod.psft.ust.hk/psc/SISPROD/EMPLOYEE
 const TIMEOUT_2FA = 3 * 60 * 1000
 
 /**
- * SIS Login Logic
- * @param {puppeteer.Page} page 
- * @param {String} username 
- * @param {String} password 
+ * SIS Login Routine
+ * @param {puppeteer.Page} page
+ * @param {String} username
+ * @param {String} password
  */
 async function login (page, username, password) {
   try {
