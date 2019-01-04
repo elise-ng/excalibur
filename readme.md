@@ -1,7 +1,9 @@
-# Project Excalibur: Chromium-powered SIS Crawler
+# Project Excalibur: Chromium-powered HKUST SIS Crawler
 > The ultimate weapon against ever changing, hard to reverse-engineer crawling targets
 
-This project is an experiment to see whether we should deploy headless chrome in our web crawler development workflow, so as to reduce workload on reverse engineering and long term maintainence. The product, if successful, could replace our current php-based ~~spaghetti-ish~~ SIS crawler.
+This project is an experiment to see whether we should deploy headless chrome at [USThing](https://github.com/USThing), so as to reduce workload on reverse engineering and long term maintainence. The product, if successful, could replace our current php-based ~~spaghetti-ish~~ SIS crawler.
+
+## THIS IS STILL WIP!
 
 ## TODO
 - [ ] Page Crawling Logic
@@ -33,12 +35,12 @@ $ npm run dev
 ### Web API
 #### GET /:scope
 - pass list of requesting data scopes separated by comma, e.g. `/grades,program_info`
-- valid scopes: `grades`, `program_info`
+- valid scopes: `grades`, `program_info` (more to come)
 #### Auth
 - pass username and password via Basic Auth header (use https on prod!)
 - 2FA approval on duo app required
 ### Config
-- add credenitals to `config.sample.json` and rename the file to `config.json`, this is for debugging until a web api is developed
+- add credenitals to `config.sample.json` and rename the file to `config.json`, this was for debugging until a web api is developed
 
 ## Contributing
 - Open Issue -> Discussion -> Pull Request -> Merge after Review -> Our world made better :)
@@ -46,3 +48,5 @@ $ npm run dev
 
 ## License
 Open sourced under MIT License
+
+Seriously, good luck on creating a "smart campus" without open data (yes i'm looking at you dear ISO staff and uni management) Bureaucracy and paperwork is ~never~ probably not the way to promote innovation :)
