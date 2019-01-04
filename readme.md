@@ -39,3 +39,10 @@ $ npm run dev
 - 2FA approval on duo app required
 ### Config
 - add credenitals to `config.sample.json` and rename the file to `config.json`, this is for debugging until a web api is developed
+
+## Contributing
+- Open Issue -> Discussion -> Pull Request -> Merge after Review -> Our world made better :)
+- Please use StandardJS linting and async-await
+
+## License
+Open sourced under MIT License
