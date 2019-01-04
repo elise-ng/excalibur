@@ -1,7 +1,7 @@
-# Project Excalibur
-> The ultimate weapon against ever changing crawling targets
+# Project Excalibur: Chromium-powered SIS Crawler
+> The ultimate weapon against ever changing, hard to reverse-engineer crawling targets
 
-This project is an experiment to see whether we can deploy headless chrome in our web crawler development workflow, so as to reduce workload on reverse engineering and long-term maintainence. The product, if successful, could replace our current php-based ~~spaghetti-ish~~ SIS crawler.
+This project is an experiment to see whether we should deploy headless chrome in our web crawler development workflow, so as to reduce workload on reverse engineering and long term maintainence. The product, if successful, could replace our current php-based ~~spaghetti-ish~~ SIS crawler.
 
 ## TODO
 - [ ] Page Crawling Logic
@@ -20,6 +20,8 @@ This project is an experiment to see whether we can deploy headless chrome in ou
   - [x] Cookie forwarding: working except cas cookie expires after session, so program info breaks on 2nd request
   - [ ] 2FA remember me: somehow can't tick the box on chrome, investigation needed
 - [ ] Benchmarks vs current crawler
+- [ ] Docker Image
+- [ ] Lambda Function Friendliness
 - [ ] CLI Interface
 
 ## Usage
