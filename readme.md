@@ -17,7 +17,7 @@ This project is an experiment to see whether we can deploy headless chrome in ou
   - [x] Grades
   - [x] Program Information
 - [ ] Quality of Life
-  - [ ] Cookie forwarding: working except cas cookie expires after session, so program info breaks (probably should use 2fa cookie to speed up like in old code)
+  - [x] Cookie forwarding: working except cas cookie expires after session, so program info breaks on 2nd request
   - [ ] 2FA remember me: somehow can't tick the box on chrome, investigation needed
 - [ ] Benchmarks vs current crawler
 - [ ] CLI Interface
@@ -30,7 +30,7 @@ $ npm run dev
 ```
 ### Web API
 #### GET /:scope
-- pass list of required data scopes separated by comma, e.g. `/grades,program_info`
+- pass list of requesting data scopes separated by comma, e.g. `/grades,program_info`
 - valid scopes: `grades`, `program_info`
 #### Auth
 - pass username and password via Basic Auth header (use https on prod!)
