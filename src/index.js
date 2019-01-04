@@ -11,6 +11,9 @@ const COOKIE_EXPIRE_DAYS = 14
 
 const app = express()
 
+/** @type puppeteer.Browser */
+let browser = null
+
 app.use(cookieParser())
 
 app.get('/:scopes', async (req, res) => {
@@ -27,15 +30,14 @@ app.get('/:scopes', async (req, res) => {
     const scopes = req.params.scopes.split(',').filter(scope => validScopes.includes(scope))
     if (scopes.length <= 0) { throw new HttpError(400, 'scopes invalid or empty') }
 
-    // launch browser
-    const browser = await puppeteer.launch({ devtools: IS_DEVELOPMENT })
-    const page = (await browser.pages())[0]
+    // launch private context
+    const context = await browser.createIncognitoBrowserContext()
+    const page = await context.newPage()
 
-    // close browser when connection close
+    // close context on connection close by client
     req.on('close', async () => {
       try {
-        if (page) { await page.deleteCookie() }
-        if (browser) { await browser.close() }
+        await context.close()
       } catch (e) {
         console.error(e.stack)
       }
@@ -63,10 +65,6 @@ app.get('/:scopes', async (req, res) => {
 
     // deliver payload
     res.status(200).json(payload)
-
-    // clear cookie and close browser
-    await page.deleteCookie()
-    await browser.close()
   } catch (e) {
     if (e instanceof HttpError.HttpError) {
       res.status(e.status).json({
@@ -83,6 +81,23 @@ app.get('/:scopes', async (req, res) => {
   }
 })
 
-const port = process.env.PORT || 8080
-app.listen(port)
-console.log(`App listening on port ${port}`)
+async function main () {
+  try {
+    // init global browser
+    browser = await puppeteer.launch({ devtools: IS_DEVELOPMENT })
+    await (await browser.pages())[0].close() // close default about:blank page
+    console.log('Browser initialized')
+    // start accepting requests
+    const port = process.env.PORT || 8080
+    app.listen(port)
+    console.log(`App listening on port ${port}`)
+  } catch (e) {
+    console.error(e.stack)
+  }
+}
+
+main()
+
+process.on('exit', () => {
+  browser.close()
+})
