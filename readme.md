@@ -8,13 +8,13 @@ This project is an experiment to see whether we should deploy headless chrome at
 ## TODO
 - [ ] Page Crawling Logic
   - [x] Login
-  - [ ] Courses
+  - [x] Courses
   - [ ] Exams
   - [x] Grades
   - [x] Program Information
 - [ ] Data Parsing and Web API
   - [x] Login
-  - [ ] Courses
+  - [x] Courses
   - [ ] Exams
   - [x] Grades
   - [x] Program Information
