@@ -25,7 +25,7 @@ app.get('/:scopes', async (req, res) => {
     }
 
     // check scopes
-    const validScopes = ['grades', 'program_info']
+    const validScopes = ['grades', 'program_info', 'class_schedule']
     /** @type {string[]} */
     const scopes = req.params.scopes.split(',').filter(scope => validScopes.includes(scope))
     if (scopes.length <= 0) { throw new HttpError(400, 'scopes invalid or empty') }
@@ -61,6 +61,11 @@ app.get('/:scopes', async (req, res) => {
     }
     if (scopes.includes('program_info')) {
       payload['program_info'] = parser.parseStudentProgramInfo(await crawler.getStudentProgramInfo(page))
+    }
+    if (scopes.includes('class_schedule')) {
+      let statusFilter = req.query.class_status || 'enrolled'
+      statusFilter = statusFilter.split(' ')
+      payload['class_schedule'] = (await crawler.getClassSchedule(page, statusFilter)).map(html => parser.parseClassSchedule(html))
     }
 
     // deliver payload

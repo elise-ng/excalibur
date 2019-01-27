@@ -7,6 +7,7 @@ const URL_SIS_LOGIN = 'https://sisprod.psft.ust.hk/psp/SISPROD/EMPLOYEE/HRMS/c/S
 const URL_CAS_2FA = 'https://cas.ust.hk/cas/js/duo/Duo-Web-v2.min.js'
 const URL_SIS_HOME = 'https://sisprod.psft.ust.hk/psc/SISPROD/EMPLOYEE/HRMS/c/SA_LEARNER_SERVICES.SSS_STUDENT_CENTER.GBL?pslnkid=Z_HC_SSS_STUDENT_CENTER_LNK&FolderPath=PORTAL_ROOT_OBJECT.Z_HC_SSS_STUDENT_CENTER_LNK&IsFolder=false&IgnoreParamTempl=FolderPath%2cIsFolder&PortalActualURL=https%3a%2f%2fsisprod.psft.ust.hk%2fpsc%2fSISPROD%2fEMPLOYEE%2fHRMS%2fc%2fSA_LEARNER_SERVICES.SSS_STUDENT_CENTER.GBL%3fpslnkid%3dZ_HC_SSS_STUDENT_CENTER_LNK&PortalContentURL=https%3a%2f%2fsisprod.psft.ust.hk%2fpsc%2fSISPROD%2fEMPLOYEE%2fHRMS%2fc%2fSA_LEARNER_SERVICES.SSS_STUDENT_CENTER.GBL%3fpslnkid%3dZ_HC_SSS_STUDENT_CENTER_LNK&PortalContentProvider=HRMS&PortalCRefLabel=Student%20Center&PortalRegistryName=EMPLOYEE&PortalServletURI=https%3a%2f%2fsisprod.psft.ust.hk%2fpsp%2fSISPROD%2f&PortalURI=https%3a%2f%2fsisprod.psft.ust.hk%2fpsc%2fSISPROD%2f&PortalHostNode=HRMS&NoCrumbs=yes'
 const URL_SIS_GRADES = 'https://sisprod.psft.ust.hk/psc/SISPROD/EMPLOYEE/HRMS/c/SA_LEARNER_SERVICES.SSR_SSENRL_GRADE.GBL'
+const URL_SIS_CLASSSCHEDULE = 'https://sisprod.psft.ust.hk/psc/SISPROD/EMPLOYEE/HRMS/c/SA_LEARNER_SERVICES.SSR_SSENRL_LIST.GBL'
 const URL_STU_PROG_INFO = 'https://w5.ab.ust.hk/jsga/graduation'
 const URL_COOKIE_SISPROD = 'https://sisprod.psft.ust.hk'
 const URL_COOKIE_LOGIN_PSFT = 'https://login.psft.ust.hk/cas'
@@ -78,6 +79,67 @@ export async function getGrades (page) {
     for (const termId of _.range(0, numOfTerms)) {
       await page.click(`${SELECTOR_TERM_INPUT}[value="${termId}"]`)
       await Promise.all([page.click(SELECTOR_CONTINUE_BUTTON), page.waitForNavigation()])
+      results.push(await page.content())
+      await Promise.all([page.click(SELECTOR_CHANGE_TERM_BUTTON), page.waitForNavigation()])
+    }
+    return results
+  } catch (e) {
+    throw e
+  }
+}
+
+/**
+ * SIS Class Schedule Crawling Routine
+ * @param {puppeteer.Page} page
+ * @param {string[]} statusFilter, array of course status ('enrolled', 'dropped', 'waitlisted')
+ * @returns {string[]} html strings of timetable pages
+ */
+export async function getClassSchedule (page, statusFilter) {
+  const SELECTOR_TERM_TABLE = 'table[id="SSR_DUMMY_RECV1$scroll$0"]'
+  const SELECTOR_CLASS_TABLE = 'table[id="PSGROUPBOXWBO"]'
+  const SELECTOR_CHANGE_TERM_BUTTON = '#DERIVED_SSS_SCT_SSS_TERM_LINK'
+  const SELECTOR_TERM_INPUT = 'input[name="SSR_DUMMY_RECV1$sels$0"]'
+  const SELECTOR_CONTINUE_BUTTON = '#DERIVED_SSS_SCT_SSR_PB_GO'
+  const SELECTOR_ENROLLED_CHECKBOX = '#DERIVED_REGFRM1_SA_STUDYLIST_E'
+  const SELECTOR_DROPPED_CHECKBOX = '#DERIVED_REGFRM1_SA_STUDYLIST_D'
+  const SELECTOR_WAITLISTED_CHECKBOX = '#DERIVED_REGFRM1_SA_STUDYLIST_W'
+  const SELECTOR_FILTER_BUTTON = 'a[id="DERIVED_REGFRM1_SA_STUDYLIST_SHOW$49$"]'
+
+  async function applyFilter (page, statusFilter) {
+    if (statusFilter === ['enrolled']) { return } // same as default, no reload needed
+    if (!await page.$(SELECTOR_FILTER_BUTTON)) { return } // filter button does not exist, probably no enrolled class
+    if (!statusFilter.includes('enrolled')) {
+      await page.click(SELECTOR_ENROLLED_CHECKBOX) // default is checked already
+    }
+    if (statusFilter.includes('dropped')) {
+      await page.click(SELECTOR_DROPPED_CHECKBOX)
+    }
+    if (statusFilter.includes('waitlisted')) {
+      await page.click(SELECTOR_WAITLISTED_CHECKBOX)
+    }
+    await Promise.all([page.click(SELECTOR_FILTER_BUTTON), page.waitForNavigation()])
+  }
+
+  try {
+    await Promise.all([page.goto(URL_SIS_CLASSSCHEDULE), Promise.race([page.waitFor(SELECTOR_TERM_TABLE), page.waitFor(SELECTOR_CLASS_TABLE)])])
+    if (await page.$(SELECTOR_TERM_TABLE) === null) {
+      // landed on current term result
+      if (await page.$(SELECTOR_CHANGE_TERM_BUTTON) !== null) {
+        // change term button available => go to term list
+        await Promise.all([page.click(SELECTOR_CHANGE_TERM_BUTTON), page.waitForNavigation()])
+      } else {
+        // change term button unavailable => return current sem only
+        await applyFilter(page, statusFilter)
+        return [await page.content()]
+      }
+    }
+    // main routine: loop through each term
+    let results = []
+    const numOfTerms = await page.$$eval(SELECTOR_TERM_INPUT, elems => elems.length)
+    for (const termId of _.range(0, numOfTerms)) {
+      await page.click(`${SELECTOR_TERM_INPUT}[value="${termId}"]`)
+      await Promise.all([page.click(SELECTOR_CONTINUE_BUTTON), page.waitForNavigation()])
+      await applyFilter(page, statusFilter)
       results.push(await page.content())
       await Promise.all([page.click(SELECTOR_CHANGE_TERM_BUTTON), page.waitForNavigation()])
     }
