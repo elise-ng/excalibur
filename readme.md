@@ -34,13 +34,14 @@ $ npm run dev
 ```
 ### Web API
 #### GET /:scope
-- pass list of requesting data scopes separated by comma, e.g. `/grades,program_info`
-- valid scopes: `grades`, `program_info`, `class_schedule` (more to come)
+- list of requested data scopes
+- separated by `,`, e.g. `/grades,program_info`
+- valid scopes: `all`, `grades`, `program_info`, `schedule` (more to come)
 #### Parameters
-##### class_status
-- filter for `class_schedule`
+##### course_status
+- filter for `schedule`
 - possible values: `enrolled`, `dropped`, `waitlisted`
-- pass list of filters separated by `+`, e.g. `/class_schedule?class_status=enrolled+waitlisted`
+- separated by `+`, e.g. `/schedule?course_status=enrolled+waitlisted`
 - default: `enrolled`
 #### Auth
 - pass username and password via Basic Auth header (use https on prod!)
