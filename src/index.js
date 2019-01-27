@@ -29,6 +29,7 @@ app.get('/:scopes', async (req, res) => {
     /** @type {string[]} */
     const scopes = req.params.scopes.split(',').filter(scope => validScopes.includes(scope))
     if (scopes.length <= 0) { throw new HttpError(400, 'scopes invalid or empty') }
+    let isAllScope = scopes.includes('all')
 
     // launch private context
     const context = await browser.createIncognitoBrowserContext()
@@ -45,7 +46,8 @@ app.get('/:scopes', async (req, res) => {
 
     // login
     let cookies = []
-    try { cookies = JSON.parse(req.cookies.forwardedCookies) } catch (e) { }
+    // use forwarded cookies if program_info is not requested
+    try { cookies = isAllScope || scopes.includes('program_info') ? [] : JSON.parse(req.cookies.forwardedCookies) } catch (e) { }
     cookies = await crawler.login(page, user.name, user.pass, cookies)
     const expireDate = new Date()
     expireDate.setDate(expireDate.getDate() + COOKIE_EXPIRE_DAYS)
@@ -55,18 +57,17 @@ app.get('/:scopes', async (req, res) => {
     })
 
     // handle scopes
-    let includesAll = scopes.includes('all')
     let payload = { success: true }
-    if (includesAll || scopes.includes('grades')) {
+    if (isAllScope || scopes.includes('grades')) {
       payload['grades'] = (await crawler.getGrades(page)).map(html => parser.parseGrades(html))
     }
-    if (includesAll || scopes.includes('program_info')) {
-      payload['program_info'] = parser.parseStudentProgramInfo(await crawler.getStudentProgramInfo(page))
-    }
-    if (includesAll || scopes.includes('class_schedule')) {
+    if (isAllScope || scopes.includes('class_schedule')) {
       let statusFilter = req.query.class_status || 'enrolled'
       statusFilter = statusFilter.split(' ')
       payload['class_schedule'] = (await crawler.getClassSchedule(page, statusFilter)).map(html => parser.parseClassSchedule(html))
+    }
+    if (isAllScope || scopes.includes('program_info')) {
+      payload['program_info'] = parser.parseStudentProgramInfo(await crawler.getStudentProgramInfo(page))
     }
 
     // deliver payload
