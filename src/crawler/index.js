@@ -94,7 +94,7 @@ export async function getGrades (page) {
  * @param {string[]} statusFilter, array of course status ('enrolled', 'dropped', 'waitlisted')
  * @returns {string[]} html strings of timetable pages
  */
-export async function getClassSchedules (page, statusFilter = ['enrolled']) {
+export async function getClassSchedule (page, statusFilter = ['enrolled']) {
   const SELECTOR_TERM_TABLE = 'table[id="SSR_DUMMY_RECV1$scroll$0"]'
   const SELECTOR_CLASS_TABLE = 'table[id="PSGROUPBOXWBO"]'
   const SELECTOR_CHANGE_TERM_BUTTON = '#DERIVED_SSS_SCT_SSS_TERM_LINK'

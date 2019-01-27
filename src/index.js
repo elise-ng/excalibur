@@ -63,7 +63,7 @@ app.get('/:scopes', async (req, res) => {
       payload['program_info'] = parser.parseStudentProgramInfo(await crawler.getStudentProgramInfo(page))
     }
     if (scopes.includes('class_schedule')) {
-      payload['class_schedule'] = await crawler.getClassSchedules(page)
+      payload['class_schedule'] = (await crawler.getClassSchedule(page)).map(html => parser.parseClassSchedule(html))
     }
 
     // deliver payload
