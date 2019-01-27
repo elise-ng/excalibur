@@ -106,6 +106,7 @@ export async function getClassSchedule (page, statusFilter = ['enrolled']) {
   const SELECTOR_FILTER_BUTTON = 'a[id="DERIVED_REGFRM1_SA_STUDYLIST_SHOW$49$"]'
 
   async function applyFilter (page, statusFilter) {
+    if (statusFilter === ['enrolled']) { return } // same as default, no reload needed
     if (!await page.$(SELECTOR_FILTER_BUTTON)) { return } // filter button does not exist, probably no enrolled class
     if (!statusFilter.includes('enrolled')) {
       await page.click(SELECTOR_ENROLLED_CHECKBOX) // default is checked already
