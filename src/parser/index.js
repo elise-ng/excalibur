@@ -129,8 +129,8 @@ export function parseSchedule (html) {
       let repeatTime = meeting.days_times.split(' ')
       if (repeatTime.length === 4) {
         meeting.weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].filter(weekday => repeatTime[0].includes(weekday.substr(0, 1)))
-        meeting.start_time = moment(repeatTime[1], 'h:mma').utcOffset(8, true).toISOString(true)
-        meeting.end_time = moment(repeatTime[3], 'h:mma').utcOffset(8, true).toISOString(true)
+        meeting.start_time = moment(repeatTime[1], 'h:mma').utcOffset(8, true).toISOString(true).split('T')[1]
+        meeting.end_time = moment(repeatTime[3], 'h:mma').utcOffset(8, true).toISOString(true).split('T')[1]
         delete meeting.days_times
       }
       // multiple instructors
