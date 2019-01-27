@@ -15,13 +15,13 @@ export function parseGrades (html) {
   let result = {}
   const $ = cheerio.load(html)
   // Semester Title
-  result['semester'] = $('.SSSPAGEKEYTEXT').text().split('|')[0].trim()
+  result.semester = $('.SSSPAGEKEYTEXT').text().split('|')[0].trim()
   // course table
-  let grades = []
+  let courses = []
   let headers = []
   $('table[class="PSLEVEL1GRID"] tbody tr').each((i, elem) => {
     if (i === 0) { // header row
-      headers = $(elem).children().map((i, elem) => cleanKey($(elem).text()))
+      headers = $(elem).children().map((i, elem) => cleanKey($(elem).text()).replace('class', 'code'))
     } else {
       let course = {}
       $(elem).children('td').each((i, elem) => {
@@ -29,33 +29,33 @@ export function parseGrades (html) {
       })
       // remove empty values
       course = _(course).omitBy(_.isEmpty).omitBy(_.isNil).value()
-      grades.push(course)
+      courses.push(course)
     }
   })
-  result['grades'] = grades
+  result.courses = courses
   // stats table
   // grade points row
   $('table[class="PSLEVEL1GRIDWBO"] tbody tr').eq(-2).children('td').each((i, elem) => {
     if (i === 1) { // TGA
-      result['term_grade_points'] = $(elem).text().trim()
+      result.term_grade_points = $(elem).text().trim()
     } else if (i === 3) { // CGA
-      result['cumulative_grade_points'] = $(elem).text().trim()
+      result.cumulative_grade_points = $(elem).text().trim()
     }
   })
   // units row
   $('table[class="PSLEVEL1GRIDWBO"] tbody tr').eq(-2).children('td').each((i, elem) => {
     if (i === 1) { // TGA
-      result['term_units'] = $(elem).text().trim()
+      result.term_units = $(elem).text().trim()
     } else if (i === 3) { // CGA
-      result['cumulative_units'] = $(elem).text().trim()
+      result.cumulative_units = $(elem).text().trim()
     }
   })
   // gpa row
   $('table[class="PSLEVEL1GRIDWBO"] tbody tr').eq(-1).children('td').each((i, elem) => {
     if (i === 1) { // TGA
-      result['tga'] = $(elem).text().trim()
+      result.tga = $(elem).text().trim()
     } else if (i === 3) { // CGA
-      result['cga'] = $(elem).text().trim()
+      result.cga = $(elem).text().trim()
     }
   })
   // remove empty values
@@ -86,19 +86,19 @@ export function parseStudentProgramInfo (html) {
  * @param {string} html html string of info page
  * @returns {object}
  */
-export function parseClassSchedule (html) {
+export function parseSchedule (html) {
   let result = {}
   const $ = cheerio.load(html)
-  result['semester'] = $('.SSSPAGEKEYTEXT').text().split('|')[0].trim()
+  result.semester = $('.SSSPAGEKEYTEXT').text().split('|')[0].trim()
   // course boxes
   let courses = []
   $('.PSGROUPBOXWBO').each((i, elem) => {
     if (i === 0) { return } // skip filter option box
     let course = {}
     let titleParts = $(elem).find('.PAGROUPDIVIDER').text().split(' - ')
-    course['code'] = titleParts[0]
-    course['title'] = titleParts[1]
-    course['classes'] = []
+    course.code = titleParts[0]
+    course.title = titleParts[1]
+    course.meetings = []
     $(elem).find('.PSLEVEL3GRIDNBO').each((i, elem) => { // inner tables
       let headers = $(elem).find('.PSLEVEL3GRIDCOLUMNHDR').map((i, elem) => cleanKey($(elem).text())) // header cells
       let rows = []
@@ -113,36 +113,36 @@ export function parseClassSchedule (html) {
       if (i === 0) { // course info
         course = { ...course, ...rows[0] }
       } else {
-        course['classes'] = rows
+        course.meetings = rows
       }
     })
     // class info further parsing
-    course['classes'] = course['classes'].map((class_) => {
+    course.meetings = course.meetings.map((meeting) => {
       // e.g. 30/01/2019 - 09/05/2019
-      let dates = class_['start_end_date'].split(' - ')
+      let dates = meeting.start_end_date.split(' - ')
       if (dates.length === 2) {
-        class_['start_date'] = moment(dates[0], 'DD/MM/YYYY').utcOffset(8, true).toISOString(true)
-        class_['end_date'] = moment(dates[1], 'DD/MM/YYYY').utcOffset(8, true).toISOString(true)
-        delete class_['start_end_date']
+        meeting.start_date = moment(dates[0], 'DD/MM/YYYY').utcOffset(8, true).toISOString(true)
+        meeting.end_date = moment(dates[1], 'DD/MM/YYYY').utcOffset(8, true).toISOString(true)
+        delete meeting.start_end_date
       }
       // e.g. WeFr 3:00PM - 4:20PM
-      let repeatTime = class_['days_times'].split(' ')
+      let repeatTime = meeting.days_times.split(' ')
       if (repeatTime.length === 4) {
-        class_['weekdays'] = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].filter(weekday => repeatTime[0].includes(weekday.substr(0, 1)))
-        class_['start_time'] = moment(repeatTime[1], 'h:mma').utcOffset(8, true).toISOString(true)
-        class_['end_time'] = moment(repeatTime[3], 'h:mma').utcOffset(8, true).toISOString(true)
-        delete class_['days_times']
+        meeting.weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].filter(weekday => repeatTime[0].includes(weekday.substr(0, 1)))
+        meeting.start_time = moment(repeatTime[1], 'h:mma').utcOffset(8, true).toISOString(true)
+        meeting.end_time = moment(repeatTime[3], 'h:mma').utcOffset(8, true).toISOString(true)
+        delete meeting.days_times
       }
       // multiple instructors
-      class_['instructor'] = class_['instructor'].replace(', \n', '; ')
+      meeting.instructor = meeting.instructor.replace(', \n', '; ')
       // remove empty values
-      class_ = _(class_).omitBy(_.isEmpty).omitBy(_.isNil).value()
-      return class_
+      meeting = _(meeting).omitBy(_.isEmpty).omitBy(_.isNil).value()
+      return meeting
     })
     // remove empty values
     course = _(course).omitBy(_.isEmpty).omitBy(_.isNil).value()
     courses.push(course)
   })
-  result['courses'] = courses
+  result.courses = courses
   return result
 }
