@@ -27,6 +27,8 @@ export function parseGrades (html) {
       $(elem).children('td').each((i, elem) => {
         course[headers[i]] = $(elem).text().trim()
       })
+      // remove empty values
+      course = _(course).omitBy(_.isEmpty).omitBy(_.isNil).value()
       grades.push(course)
     }
   })
@@ -56,6 +58,8 @@ export function parseGrades (html) {
       result['cga'] = $(elem).text().trim()
     }
   })
+  // remove empty values
+  result = _(result).omitBy(_.isEmpty).omitBy(_.isNil).value()
   return result
 }
 
@@ -72,6 +76,8 @@ export function parseStudentProgramInfo (html) {
     const value = $(elem).children('td').last().text().trim()
     result[key] = value
   })
+  // remove empty values
+  result = _(result).omitBy(_.isEmpty).omitBy(_.isNil).value()
   return result
 }
 
