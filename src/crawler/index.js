@@ -112,10 +112,10 @@ export async function getClassSchedule (page, statusFilter) {
       await page.click(SELECTOR_ENROLLED_CHECKBOX) // default is checked already
     }
     if (statusFilter.includes('dropped')) {
-      await page.click(SELECTOR_DROPPED_CHECKBOX) // default is checked already
+      await page.click(SELECTOR_DROPPED_CHECKBOX)
     }
     if (statusFilter.includes('waitlisted')) {
-      await page.click(SELECTOR_WAITLISTED_CHECKBOX) // default is checked already
+      await page.click(SELECTOR_WAITLISTED_CHECKBOX)
     }
     await Promise.all([page.click(SELECTOR_FILTER_BUTTON), page.waitForNavigation()])
   }

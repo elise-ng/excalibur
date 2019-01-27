@@ -60,6 +60,7 @@ export function parseGrades (html) {
 /**
  * Student Program Info Page Parser
  * @param {string} html html string of info page
+ * @returns {object}
  */
 export function parseStudentProgramInfo (html) {
   let result = {}
@@ -75,6 +76,7 @@ export function parseStudentProgramInfo (html) {
 /**
  * SIS Class Schedule Page Parser
  * @param {string} html html string of info page
+ * @returns {object}
  */
 export function parseClassSchedule (html) {
   let result = {}
@@ -83,25 +85,24 @@ export function parseClassSchedule (html) {
   // course boxes
   let courses = []
   $('.PSGROUPBOXWBO').each((i, elem) => {
-    if (i === 0) { return } // first result is filter option box
+    if (i === 0) { return } // skip filter option box
     let course = {}
     let titleParts = $(elem).find('.PAGROUPDIVIDER').text().split(' - ')
     course['code'] = titleParts[0]
     course['title'] = titleParts[1]
-    // info table
     course['classes'] = []
-    $(elem).find('.PSLEVEL3GRIDNBO').each((i, elem) => {
-      let headers = $(elem).find('.PSLEVEL3GRIDCOLUMNHDR').map((i, elem) => cleanKey($(elem).text()))
+    $(elem).find('.PSLEVEL3GRIDNBO').each((i, elem) => { // inner tables
+      let headers = $(elem).find('.PSLEVEL3GRIDCOLUMNHDR').map((i, elem) => cleanKey($(elem).text())) // header cells
       let rows = []
       let row = {}
-      $(elem).find('.PSLEVEL3GRIDROW').each((i, elem) => {
+      $(elem).find('.PSLEVEL3GRIDROW').each((i, elem) => { // data cells
         row[headers[i % headers.length]] = $(elem).text().trim()
-        if (i % headers.length === headers.length - 1) { // separate rows
+        if (i % headers.length === headers.length - 1) { // separate rows by num of col
           rows.push(row)
           row = {}
         }
       })
-      if (i === 0) { // first section is course info
+      if (i === 0) { // course info
         course = { ...course, ...rows[0] }
       } else {
         course['classes'] = rows
