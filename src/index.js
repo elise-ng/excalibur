@@ -63,7 +63,9 @@ app.get('/:scopes', async (req, res) => {
       payload['program_info'] = parser.parseStudentProgramInfo(await crawler.getStudentProgramInfo(page))
     }
     if (scopes.includes('class_schedule')) {
-      payload['class_schedule'] = (await crawler.getClassSchedule(page)).map(html => parser.parseClassSchedule(html))
+      let statusFilter = req.query.class_status || 'enrolled'
+      statusFilter = statusFilter.split(' ')
+      payload['class_schedule'] = (await crawler.getClassSchedule(page, statusFilter)).map(html => parser.parseClassSchedule(html))
     }
 
     // deliver payload
