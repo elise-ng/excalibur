@@ -1,4 +1,6 @@
 import cheerio from 'cheerio'
+import moment from 'moment'
+import _ from 'lodash'
 
 function cleanKey (string) {
   return string.trim().toLowerCase().replace(/\W+/g, '_')
@@ -108,6 +110,31 @@ export function parseClassSchedule (html) {
         course['classes'] = rows
       }
     })
+    // class info further parsing
+    course['classes'] = course['classes'].map((class_) => {
+      // e.g. 30/01/2019 - 09/05/2019
+      let dates = class_['start_end_date'].split(' - ')
+      if (dates.length === 2) {
+        class_['start_date'] = moment(dates[0], 'DD/MM/YYYY').utcOffset(8, true).toISOString(true)
+        class_['end_date'] = moment(dates[1], 'DD/MM/YYYY').utcOffset(8, true).toISOString(true)
+        delete class_['start_end_date']
+      }
+      // e.g. WeFr 3:00PM - 4:20PM
+      let repeatTime = class_['days_times'].split(' ')
+      if (repeatTime.length === 4) {
+        class_['weekdays'] = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].filter(weekday => repeatTime[0].includes(weekday.substr(0, 1)))
+        class_['start_time'] = moment(repeatTime[1], 'h:mma').utcOffset(8, true).toISOString(true)
+        class_['end_time'] = moment(repeatTime[3], 'h:mma').utcOffset(8, true).toISOString(true)
+        delete class_['days_times']
+      }
+      // multiple instructors
+      class_['instructor'] = class_['instructor'].replace(', \n', '; ')
+      // remove empty values
+      class_ = _(class_).omitBy(_.isEmpty).omitBy(_.isNil).value()
+      return class_
+    })
+    // remove empty values
+    course = _(course).omitBy(_.isEmpty).omitBy(_.isNil).value()
     courses.push(course)
   })
   result['courses'] = courses
