@@ -33,7 +33,7 @@ $ npm i
 $ npm run dev
 ```
 ### Web API
-#### GET /:scope
+#### POST /:scope
 - list of requested data scopes
 - separated by `,`, e.g. `/grades,program_info`
 - valid scopes: `all`, `grades`, `program_info`, `schedule` (more to come)
@@ -44,7 +44,13 @@ $ npm run dev
 - separated by `+`, e.g. `/schedule?course_status=enrolled+waitlisted`
 - default: `enrolled`
 #### Auth
-- pass username and password via Basic Auth header (use https on prod!)
+- pass username and password via post body:
+```json
+{
+    "username":"",
+    "password":""
+}
+```
 - 2FA approval on duo app required
 ### Config
 - add credenitals to `config.sample.json` and rename the file to `config.json`, this was for debugging until a web api is developed
