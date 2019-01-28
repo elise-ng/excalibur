@@ -1,5 +1,5 @@
 // eslint-disable-next-line no-unused-vars
-import puppeteer from 'puppeteer' // keep here for auto suggestion
+import puppeteer from 'puppeteer-core' // keep here for auto suggestion
 import _ from 'lodash'
 import HttpError from 'http-errors'
 

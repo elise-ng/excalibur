@@ -1,8 +1,11 @@
+import awsServerlessExpress from 'aws-serverless-express'
 import express from 'express'
-import puppeteer from 'puppeteer'
+import puppeteer from 'puppeteer-core'
+import launchChrome from '@serverless-chrome/lambda'
+import axios from 'axios'
 import HttpError from 'http-errors'
-import auth from 'basic-auth'
 import cookieParser from 'cookie-parser'
+import cors from 'cors'
 import * as crawler from './crawler'
 import * as parser from './parser'
 
@@ -11,44 +14,41 @@ const COOKIE_EXPIRE_DAYS = 14
 
 const app = express()
 
-/** @type puppeteer.Browser */
-let browser = null
-
+app.use(cors())
+app.options('*', cors())
 app.use(cookieParser())
 
 app.get('/:scopes', async (req, res) => {
+  /** @type puppeteer.Browser */
+  let chrome = null
   try {
     // check user auth exist
-    const user = auth(req)
-    if (!user || !user.name || !user.pass) {
+    const username = req.header('X-Excalibur-Username')
+    const password = req.header('X-Excalibur-Password')
+    if (!username || !password) {
       throw new HttpError(401, 'username or password empty')
     }
 
     // check scopes
-    const validScopes = ['all', 'grades', 'program_info', 'schedule']
+    const validScopes = ['all', 'login', 'grades', 'program_info', 'schedule']
     /** @type {string[]} */
-    const scopes = req.params.scopes.split(',').filter(scope => validScopes.includes(scope))
+    const scopes = req.params.scopes.split('+').filter(scope => validScopes.includes(scope))
     if (scopes.length <= 0) { throw new HttpError(400, 'scopes invalid or empty') }
     let isAllScope = scopes.includes('all')
 
-    // launch private context
-    const context = await browser.createIncognitoBrowserContext()
-    const page = await context.newPage()
-
-    // close context on connection close by client
-    req.on('close', async () => {
-      try {
-        await context.close()
-      } catch (e) {
-        console.error(e.stack)
-      }
+    // launch chrome
+    chrome = await launchChrome()
+    const chromeInfo = (await axios.get(`${chrome.url}/json/version`)).data
+    const browser = await puppeteer.connect({ // FIXME: puppeteer supports browserURL directly in future version
+      browserWSEndpoint: chromeInfo.webSocketDebuggerUrl
     })
+    const page = (await browser.pages())[0]
 
     // login
     let cookies = []
     // use forwarded cookies if program_info is not requested
     try { cookies = isAllScope || scopes.includes('program_info') ? [] : JSON.parse(req.cookies.forwardedCookies) } catch (e) { }
-    cookies = await crawler.login(page, user.name, user.pass, cookies)
+    cookies = await crawler.login(page, username, password, cookies)
     const expireDate = new Date()
     expireDate.setDate(expireDate.getDate() + COOKIE_EXPIRE_DAYS)
     res.cookie('forwardedCookies', JSON.stringify(cookies), {
@@ -85,26 +85,22 @@ app.get('/:scopes', async (req, res) => {
         error: `Internal server error: ${e.toString()}`
       })
     }
+  } finally {
+    try {
+      if (chrome) { await chrome.kill() }
+    } catch (e) {
+      console.error(e.stack)
+    }
   }
 })
 
-async function main () {
-  try {
-    // init global browser
-    browser = await puppeteer.launch({ devtools: IS_DEVELOPMENT })
-    await (await browser.pages())[0].close() // close default about:blank page
-    console.log('Browser initialized')
-    // start accepting requests
-    const port = process.env.PORT || 8080
-    app.listen(port)
-    console.log(`App listening on port ${port}`)
-  } catch (e) {
-    console.error(e.stack)
-  }
+if (!process.env.AWS_EXECUTION_ENV) {
+  const port = process.env.PORT || 8080
+  app.listen(port)
+  console.log(`App listening on port ${port}`)
+} else {
+  console.log(`App started on Lambda`)
 }
 
-main()
-
-process.on('exit', () => {
-  browser.close()
-})
+const server = awsServerlessExpress.createServer(app)
+exports.handler = (event, context) => { awsServerlessExpress.proxy(server, event, context) }

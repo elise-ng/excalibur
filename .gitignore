@@ -88,3 +88,4 @@ typings/
 
 config.json
 build/
+dist/
