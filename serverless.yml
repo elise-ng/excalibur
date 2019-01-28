@@ -3,6 +3,13 @@ service: excalibur
 provider:
   name: aws
   runtime: nodejs8.10
+  region: ap-northeast-1
+
+package:
+  exclude:
+    - ./**
+  include:
+    - dist/**
 
 functions:
   excalibur:

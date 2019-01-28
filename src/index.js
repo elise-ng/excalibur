@@ -1,4 +1,4 @@
-import serverless from 'serverless-http'
+import awsServerlessExpress from 'aws-serverless-express'
 import express from 'express'
 import puppeteer from 'puppeteer-core'
 import launchChrome from '@serverless-chrome/lambda'
@@ -106,4 +106,5 @@ const port = process.env.PORT || 8080
 app.listen(port)
 console.log(`App listening on port ${port}`)
 
-export const handler = serverless(app)
+const server = awsServerlessExpress.createServer(app)
+exports.handler = (event, context) => { awsServerlessExpress.proxy(server, event, context) }

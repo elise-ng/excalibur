@@ -14,6 +14,7 @@
   "license": "ISC",
   "dependencies": {
     "@serverless-chrome/lambda": "^1.0.0-55",
+    "aws-serverless-express": "^3.3.5",
     "axios": "^0.18.0",
     "basic-auth": "^2.0.1",
     "cheerio": "^1.0.0-rc.2",
@@ -22,8 +23,7 @@
     "http-errors": "^1.7.1",
     "lodash": "^4.17.11",
     "moment": "^2.24.0",
-    "puppeteer-core": "^1.11.0",
-    "serverless-http": "^1.9.0"
+    "puppeteer-core": "^1.11.0"
   },
   "devDependencies": {
     "@babel/core": "^7.2.2",
