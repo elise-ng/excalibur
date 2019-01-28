@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "npx webpack",
-    "start": "node dist/bundle.js",
+    "start": "node dist/src/index.js",
     "dev": "npx webpack --mode development && NODE_ENV=development npm run start",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
