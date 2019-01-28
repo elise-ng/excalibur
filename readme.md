@@ -23,7 +23,7 @@ This personal project is an experiment to see whether headless chrome and server
 - [ ] Quality of Life
   - [x] Cookie forwarding: working except cas cookie expires after session, so `program_info` breaks on 2nd request
   - [ ] 2FA remember me: somehow can't tick the box on chrome, investigation needed
-- [ ] Benchmarks vs current scraper
+- [x] Benchmarks vs current scraper
 - [ ] Docker Image
 - [x] Serverless Config
 - [ ] CLI Interface
@@ -67,6 +67,22 @@ $ serverless deploy
 ### Config
 - this was for debugging before web api is developed, leaving it here for possible cli development
 - add credenitals to `config.sample.json` and rename the file to `config.json`
+
+## Benchmarks
+The following benchmark was measured from an off-campus location. Excalibur instance was hosted on AWS Lambda in Tokyo and PHP API was hosted on USThing server at HKUST campus (with Cloudflare CDN in between, ~5ms taken)
+|  |Excalibur|  |  |  |PHP API  |  |  |  |
+|--|---------|--|--|--|---------|--|--|--|
+|(response time in ms)|run 1|run 2|run 3|mean|run 1|run 2|run 3|mean|
+|Ping|55.469|57.405|56.426|56.433|7.201|6.431|6.541|6.724|
+|Login with cookie cached|3016|5937|3066|4006.333|2622|2679|2224|2508.333|
+|Timetable|7677|7321|7107|7368.333|816|893|850|853|
+|Grades|14713|14866|14375|14651.333|838|861|753|817.333|
+### Discussion
+- compared to php-based api, excalibur responses were much slower especially in Grades
+- this is probably due to time consumed by real browser rendering and lack of result caching (PHP API cache past grades for quick re-access)
+- another major factor is the physical distance between AWS datacenters and Hong Kong, where the performance penalty were multiplied by number of pages fetched
+- further enhancements can be done on Excalibur e.g. filters for fetching data of latest semester only (useful for grades / waitlist refresh; or in the use case of USThing past data were stored on client)
+- TODO: re-run benchmarks for Excalibur on a local server
 
 ## Contributing
 - Open Issue -> Discussion -> Pull Request -> Merge after Review -> Our world made better :)
