@@ -1,12 +1,16 @@
 /* eslint-disable semi */
 const path = require('path');
+const nodeExternals = require('webpack-node-externals');
 
 module.exports = {
+  mode: 'production',
   target: 'node',
   entry: './src/index.js',
+  externals: [nodeExternals()],
   output: {
+    libraryTarget: 'commonjs',
     path: path.resolve(__dirname, 'dist'),
-    filename: 'bundle.js'
+    filename: './src/index.js'
   },
   module: {
     rules: [

@@ -2,18 +2,19 @@ service: excalibur
 
 provider:
   name: aws
-  runtime: nodejs8.10
+  runtime: nodejs6.10
   region: ap-northeast-1
 
-package:
-  exclude:
-    - ./**
-  include:
-    - node_modules/**
-    - dist/**
+plugins:
+- serverless-webpack
+
+custom:
+  webpack:
+    includeModules: true
 
 functions:
   excalibur:
-    handler: dist/bundle.handler
+    handler: src/index.handler
     events:
       - http: ANY /
+      - http: ANY {proxy+}
