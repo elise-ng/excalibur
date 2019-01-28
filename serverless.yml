@@ -9,6 +9,7 @@ package:
   exclude:
     - ./**
   include:
+    - node_modules/**
     - dist/**
 
 functions:
