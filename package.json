@@ -14,6 +14,7 @@
   "license": "ISC",
   "dependencies": {
     "@serverless-chrome/lambda": "^1.0.0-55",
+    "axios": "^0.18.0",
     "basic-auth": "^2.0.1",
     "cheerio": "^1.0.0-rc.2",
     "cookie-parser": "^1.4.3",

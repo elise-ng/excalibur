@@ -2,6 +2,7 @@ import serverless from 'serverless-http'
 import express from 'express'
 import puppeteer from 'puppeteer-core'
 import launchChrome from '@serverless-chrome/lambda'
+import axios from 'axios'
 import HttpError from 'http-errors'
 import auth from 'basic-auth'
 import cookieParser from 'cookie-parser'
@@ -34,9 +35,9 @@ app.get('/:scopes', async (req, res) => {
 
     // launch chrome
     const chrome = await launchChrome()
-    console.log(JSON.stringify(chrome))
-    browser = await puppeteer.connect({
-      browserURL: chrome.url
+    const chromeInfo = (await axios.get(`${chrome.url}/json/version`)).data
+    browser = await puppeteer.connect({ // FIXME: puppeteer supports browserURL directly in future version
+      browserWSEndpoint: chromeInfo.webSocketDebuggerUrl
     })
     await (await browser.pages())[0].close() // close default about:blank page
     const context = await browser.createIncognitoBrowserContext()
