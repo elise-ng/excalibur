@@ -1,7 +1,9 @@
 # Project Excalibur: Serverless, Chromium-powered HKUST SIS Scraper
 > The ultimate weapon against ever changing, hard to reverse-engineer crawling targets
 
-This project is an experiment to see whether we could deploy headless chrome and serverless architecture at [USThing](https://github.com/USThing), so as to reduce workload on reverse engineering and long term maintainence. The product, if successful, could replace our current php-based ~~spaghetti-ish~~ SIS scraper. 
+[![USThing](https://badgen.net/badge/%E2%99%A5/USThing/blue)](https://github.com/USThing)
+
+This personal project is an experiment to see whether headless chrome and serverless architecture could be deployed at USThing, so as to reduce workload on reverse engineering and long term maintainence. The product, if successful, could replace our current php-based ~~spaghetti-ish~~ SIS scraper. 
 
 ## TODO
 - [ ] Page Crawling Logic
