@@ -40,14 +40,12 @@ app.post('/:scopes', async (req, res) => {
     browser = await puppeteer.connect({ // FIXME: puppeteer supports browserURL directly in future version
       browserWSEndpoint: chromeInfo.webSocketDebuggerUrl
     })
-    await (await browser.pages())[0].close() // close default about:blank page
-    const context = await browser.createIncognitoBrowserContext()
-    const page = await context.newPage()
+    const page = (await browser.pages())[0]
 
-    // close context on connection close by client
+    // close browser on connection close by client
     req.on('close', async () => {
       try {
-        await context.close()
+        await browser.close()
       } catch (e) {
         console.error(e.stack)
       }
