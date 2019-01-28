@@ -1,9 +1,7 @@
-# Project Excalibur: Chromium-powered HKUST SIS Crawler
+# Project Excalibur: Serverless, Chromium-powered HKUST SIS Scraper
 > The ultimate weapon against ever changing, hard to reverse-engineer crawling targets
 
-This project is an experiment to see whether we should deploy headless chrome at [USThing](https://github.com/USThing), so as to reduce workload on reverse engineering and long term maintainence. The product, if successful, could replace our current php-based ~~spaghetti-ish~~ SIS crawler.
-
-## THIS IS STILL WIP!
+This project is an experiment to see whether we could deploy headless chrome and serverless architecture at [USThing](https://github.com/USThing), so as to reduce workload on reverse engineering and long term maintainence. The product, if successful, could replace our current php-based ~~spaghetti-ish~~ SIS scraper. 
 
 ## TODO
 - [ ] Page Crawling Logic
@@ -19,9 +17,9 @@ This project is an experiment to see whether we should deploy headless chrome at
   - [x] Grades
   - [x] Program Information
 - [ ] Quality of Life
-  - [x] Cookie forwarding: working except cas cookie expires after session, so program info breaks on 2nd request
+  - [x] Cookie forwarding: working except cas cookie expires after session, so `program_info` breaks on 2nd request
   - [ ] 2FA remember me: somehow can't tick the box on chrome, investigation needed
-- [ ] Benchmarks vs current crawler
+- [ ] Benchmarks vs current scraper
 - [ ] Docker Image
 - [x] Serverless Config
 - [ ] CLI Interface
@@ -33,11 +31,13 @@ $ npm i
 $ npm run dev
 ```
 ### Deploy to AWS
+- Deploys to ap-northeast-1 (Tokyo) 512MB ram lambda instances
+- You will need to create an aws account (free tier?) and setup serverless client beforehand
 ```sh
-$ serverless deploy # you will need to setup an aws account and serverless client beforehand
+$ serverless deploy
 ```
 
-### Web API
+### REST API
 #### GET /:scopes
 - list of requested data scopes
 - separated by `+`, e.g. `/grades+program_info`
@@ -68,5 +68,3 @@ $ serverless deploy # you will need to setup an aws account and serverless clien
 
 ## License
 Open sourced under MIT License
-
-Seriously, good luck on creating a "smart campus" without open data (yes i'm looking at you dear ISO staff and uni management) Bureaucracy and paperwork is ~never~ probably not the way to promote innovation :)
