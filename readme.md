@@ -50,7 +50,7 @@ $ serverless deploy
 - return response immediately after login (with forwarded cookies to preserve login state)
 - actual data requests can be done in subsequent requests
 #### Auth
-- pass username and password via `X-Excalibur-Username` and `X-Excalibur-Password`
+- pass username and password via `X-Excalibur-Username` and `X-Excalibur-Password` headers
 - 2FA approval on duo app required during first request
 - cookies received from source sites are forwarded so login state is retained
 - for `program_info` scope, cookie forwarding is not working due to short-lived cas cookies. fresh login is required.
