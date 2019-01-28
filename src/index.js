@@ -19,7 +19,6 @@ app.options('*', cors())
 app.use(cookieParser())
 
 app.get('/:scopes', async (req, res) => {
-  /** @type puppeteer.Browser */
   let chrome = null
   try {
     // check user auth exist
