@@ -5,6 +5,7 @@ import launchChrome from '@serverless-chrome/lambda'
 import axios from 'axios'
 import HttpError from 'http-errors'
 import cookieParser from 'cookie-parser'
+import cors from 'cors'
 import * as crawler from './crawler'
 import * as parser from './parser'
 
@@ -13,6 +14,8 @@ const COOKIE_EXPIRE_DAYS = 14
 
 const app = express()
 
+app.use(cors())
+app.options('*', cors())
 app.use(cookieParser())
 
 app.get('/:scopes', async (req, res) => {
