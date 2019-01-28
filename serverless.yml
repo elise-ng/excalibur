@@ -1,0 +1,11 @@
+service: excalibur
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+
+functions:
+  excalibur:
+    handler: dist/bundle.handler
+    events:
+      - http: ANY /

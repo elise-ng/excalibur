@@ -1,3 +1,4 @@
+/* eslint-disable semi */
 const path = require('path');
 
 module.exports = {

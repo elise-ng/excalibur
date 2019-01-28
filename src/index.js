@@ -1,5 +1,7 @@
+import serverless from 'serverless-http'
 import express from 'express'
-import puppeteer from 'puppeteer'
+import puppeteer from 'puppeteer-core'
+import launchChrome from '@serverless-chrome/lambda'
 import HttpError from 'http-errors'
 import auth from 'basic-auth'
 import cookieParser from 'cookie-parser'
@@ -11,12 +13,11 @@ const COOKIE_EXPIRE_DAYS = 14
 
 const app = express()
 
-/** @type puppeteer.Browser */
-let browser = null
-
 app.use(cookieParser())
 
 app.get('/:scopes', async (req, res) => {
+  /** @type puppeteer.Browser */
+  let browser = null
   try {
     // check user auth exist
     const user = auth(req)
@@ -31,7 +32,13 @@ app.get('/:scopes', async (req, res) => {
     if (scopes.length <= 0) { throw new HttpError(400, 'scopes invalid or empty') }
     let isAllScope = scopes.includes('all')
 
-    // launch private context
+    // launch chrome
+    const chrome = await launchChrome()
+    console.log(JSON.stringify(chrome))
+    browser = await puppeteer.connect({
+      browserURL: chrome.url
+    })
+    await (await browser.pages())[0].close() // close default about:blank page
     const context = await browser.createIncognitoBrowserContext()
     const page = await context.newPage()
 
@@ -85,26 +92,17 @@ app.get('/:scopes', async (req, res) => {
         error: `Internal server error: ${e.toString()}`
       })
     }
+  } finally {
+    try {
+      if (browser) { await browser.close() }
+    } catch (e) {
+      console.error(e.stack)
+    }
   }
 })
 
-async function main () {
-  try {
-    // init global browser
-    browser = await puppeteer.launch({ devtools: IS_DEVELOPMENT })
-    await (await browser.pages())[0].close() // close default about:blank page
-    console.log('Browser initialized')
-    // start accepting requests
-    const port = process.env.PORT || 8080
-    app.listen(port)
-    console.log(`App listening on port ${port}`)
-  } catch (e) {
-    console.error(e.stack)
-  }
-}
+const port = process.env.PORT || 8080
+app.listen(port)
+console.log(`App listening on port ${port}`)
 
-main()
-
-process.on('exit', () => {
-  browser.close()
-})
+export const handler = serverless(app)
