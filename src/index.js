@@ -44,16 +44,6 @@ app.get('/:scopes', async (req, res) => {
     })
     const page = (await browser.pages())[0]
 
-    // close browser on connection close by client
-    req.on('close', async () => {
-      try {
-        await browser.close()
-        browser = null
-      } catch (e) {
-        console.error(e.stack)
-      }
-    })
-
     // login
     let cookies = []
     // use forwarded cookies if program_info is not requested
