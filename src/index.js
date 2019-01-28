@@ -4,7 +4,6 @@ import puppeteer from 'puppeteer-core'
 import launchChrome from '@serverless-chrome/lambda'
 import axios from 'axios'
 import HttpError from 'http-errors'
-import bodyParser from 'body-parser'
 import cookieParser from 'cookie-parser'
 import * as crawler from './crawler'
 import * as parser from './parser'
@@ -14,23 +13,23 @@ const COOKIE_EXPIRE_DAYS = 14
 
 const app = express()
 
-app.use(bodyParser.json())
 app.use(cookieParser())
 
-app.post('/:scopes', async (req, res) => {
+app.get('/:scopes', async (req, res) => {
   /** @type puppeteer.Browser */
   let browser = null
   try {
     // check user auth exist
-    const user = req.body
-    if (!user || !user.username || !user.password) {
+    const username = req.header('X-Excalibur-Username')
+    const password = req.header('X-Excalibur-Password')
+    if (!username || !password) {
       throw new HttpError(401, 'username or password empty')
     }
 
     // check scopes
-    const validScopes = ['all', 'grades', 'program_info', 'schedule']
+    const validScopes = ['all', 'login', 'grades', 'program_info', 'schedule']
     /** @type {string[]} */
-    const scopes = req.params.scopes.split(',').filter(scope => validScopes.includes(scope))
+    const scopes = req.params.scopes.split('+').filter(scope => validScopes.includes(scope))
     if (scopes.length <= 0) { throw new HttpError(400, 'scopes invalid or empty') }
     let isAllScope = scopes.includes('all')
 
@@ -55,7 +54,7 @@ app.post('/:scopes', async (req, res) => {
     let cookies = []
     // use forwarded cookies if program_info is not requested
     try { cookies = isAllScope || scopes.includes('program_info') ? [] : JSON.parse(req.cookies.forwardedCookies) } catch (e) { }
-    cookies = await crawler.login(page, user.username, user.password, cookies)
+    cookies = await crawler.login(page, username, password, cookies)
     const expireDate = new Date()
     expireDate.setDate(expireDate.getDate() + COOKIE_EXPIRE_DAYS)
     res.cookie('forwardedCookies', JSON.stringify(cookies), {
