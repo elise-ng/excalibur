@@ -48,6 +48,7 @@ app.get('/:scopes', async (req, res) => {
     req.on('close', async () => {
       try {
         await browser.close()
+        browser = null
       } catch (e) {
         console.error(e.stack)
       }
