@@ -70,6 +70,7 @@ $ serverless deploy
 
 ## Benchmarks
 The following benchmark was measured from an off-campus location. Excalibur instance was hosted on AWS Lambda in Tokyo and PHP API was hosted on USThing server at HKUST campus (with Cloudflare CDN in between, ~5ms taken)
+
 |  |Excalibur|  |  |  |PHP API  |  |  |  |
 |--|---------|--|--|--|---------|--|--|--|
 |(response time in ms)|run 1|run 2|run 3|mean|run 1|run 2|run 3|mean|
@@ -77,6 +78,7 @@ The following benchmark was measured from an off-campus location. Excalibur inst
 |Login with cookie cached|3016|5937|3066|4006.333|2622|2679|2224|2508.333|
 |Timetable|7677|7321|7107|7368.333|816|893|850|853|
 |Grades|14713|14866|14375|14651.333|838|861|753|817.333|
+
 ### Discussion
 - compared to php-based api, excalibur responses were much slower especially in Grades
 - this is probably due to time consumed by real browser rendering and lack of result caching (PHP API cache past grades for quick re-access)
