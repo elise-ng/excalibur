@@ -23,7 +23,7 @@ This personal project is an experiment to see whether headless chrome and server
 - [ ] Quality of Life
   - [x] Cookie forwarding: working except cas cookie expires after session, so `program_info` breaks on 2nd request
   - [ ] 2FA remember me: somehow can't tick the box on chrome, investigation needed
-- [ ] Benchmarks vs current scraper
+- [x] Benchmarks vs current scraper
 - [ ] Docker Image
 - [x] Serverless Config
 - [ ] CLI Interface
