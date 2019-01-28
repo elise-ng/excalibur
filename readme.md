@@ -65,7 +65,8 @@ $ serverless deploy
 
 
 ### Config
-- add credenitals to `config.sample.json` and rename the file to `config.json`, this was for debugging until a web api is developed
+- this was for debugging before web api is developed, leaving it here for possible cli development
+- add credenitals to `config.sample.json` and rename the file to `config.json`
 
 ## Contributing
 - Open Issue -> Discussion -> Pull Request -> Merge after Review -> Our world made better :)
