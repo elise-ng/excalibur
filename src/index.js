@@ -94,9 +94,13 @@ app.get('/:scopes', async (req, res) => {
   }
 })
 
-const port = process.env.PORT || 8080
-app.listen(port)
-console.log(`App listening on port ${port}`)
+if (!process.env.AWS_EXECUTION_ENV) {
+  const port = process.env.PORT || 8080
+  app.listen(port)
+  console.log(`App listening on port ${port}`)
+} else {
+  console.log(`App started on Lambda`)
+}
 
 const server = awsServerlessExpress.createServer(app)
 exports.handler = (event, context) => { awsServerlessExpress.proxy(server, event, context) }
