@@ -3,7 +3,7 @@
 [![USThing](https://badgen.net/badge/%E2%99%A5/USThing/blue)](https://github.com/USThing)
 [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 
-> The ultimate weapon against ever changing, hard to reverse-engineer crawling targets
+> The ultimate weapon against ever changing, hard to reverse-engineer scraping targets
 
 This personal project is an experiment to see whether headless chrome and serverless architecture could be deployed at USThing, so as to reduce workload on reverse engineering and long term maintainence. The product, if successful, could replace our current php-based ~~spaghetti-ish~~ SIS scraper. 
 
