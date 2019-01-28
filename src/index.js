@@ -20,7 +20,7 @@ app.use(cookieParser())
 
 app.get('/:scopes', async (req, res) => {
   /** @type puppeteer.Browser */
-  let browser = null
+  let chrome = null
   try {
     // check user auth exist
     const username = req.header('X-Excalibur-Username')
@@ -37,9 +37,9 @@ app.get('/:scopes', async (req, res) => {
     let isAllScope = scopes.includes('all')
 
     // launch chrome
-    const chrome = await launchChrome()
+    chrome = await launchChrome()
     const chromeInfo = (await axios.get(`${chrome.url}/json/version`)).data
-    browser = await puppeteer.connect({ // FIXME: puppeteer supports browserURL directly in future version
+    const browser = await puppeteer.connect({ // FIXME: puppeteer supports browserURL directly in future version
       browserWSEndpoint: chromeInfo.webSocketDebuggerUrl
     })
     const page = (await browser.pages())[0]
@@ -87,7 +87,7 @@ app.get('/:scopes', async (req, res) => {
     }
   } finally {
     try {
-      if (browser) { await browser.close() }
+      if (chrome) { await chrome.kill() }
     } catch (e) {
       console.error(e.stack)
     }
