@@ -1,6 +1,7 @@
 # Project Excalibur: Serverless, Chromium-powered HKUST SIS Scraper
 
 [![USThing](https://badgen.net/badge/%E2%99%A5/USThing/blue)](https://github.com/USThing)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/fa5cfa42e6b24454b09e861ff0c2e4ae)](https://www.codacy.com/app/chihimng/excalibur?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=chihimng/excalibur&amp;utm_campaign=Badge_Grade)
 [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 
 > The ultimate weapon against ever changing, hard to reverse-engineer scraping targets
