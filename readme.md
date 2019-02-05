@@ -35,7 +35,7 @@ $ npm i
 $ npm run dev
 ```
 ### Deploy to AWS
-- Deploys to ap-northeast-1 (Tokyo) 512MB ram lambda instances
+- Deploys to ap-southeast-1 (Singapore) 512MB ram lambda instances
 - You will need to create an aws account (free tier?) and setup serverless client beforehand
 ```sh
 $ serverless deploy
@@ -70,6 +70,8 @@ $ serverless deploy
 
 ## Benchmarks
 The following benchmark was measured from an off-campus location. Excalibur instance was hosted on AWS Lambda in Tokyo and PHP API was hosted on USThing server at HKUST campus (with Cloudflare CDN in between, ~5ms taken)
+
+(Note: Appearently Singapore region has better ping to HK, will revisit this later)
 
 |  |Excalibur|  |  |  |PHP API  |  |  |  |
 |--|---------|--|--|--|---------|--|--|--|
