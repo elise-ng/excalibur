@@ -12,6 +12,10 @@ module.exports = {
     path: path.resolve(__dirname, 'dist'),
     filename: './src/index.js'
   },
+  node: {
+    // To not replace __dirname with '/'
+    __dirname: false
+  },
   module: {
     rules: [
       {

@@ -6,6 +6,7 @@ import axios from 'axios'
 import HttpError from 'http-errors'
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
+import {getConfig} from './util/config'
 import * as crawler from './crawler'
 import * as parser from './parser'
 
@@ -20,10 +21,13 @@ app.use(cookieParser())
 
 app.get('/:scopes', async (req, res) => {
   let chrome = null
+
+  const CREDENTIALS = IS_DEVELOPMENT ? await getConfig() : {}
+
   try {
     // check user auth exist
-    const username = req.header('X-Excalibur-Username')
-    const password = req.header('X-Excalibur-Password')
+    const username = req.header('X-Excalibur-Username') || CREDENTIALS.username
+    const password = req.header('X-Excalibur-Password') || CREDENTIALS.password
     if (!username || !password) {
       throw new HttpError(401, 'username or password empty')
     }

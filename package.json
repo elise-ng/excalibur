@@ -6,7 +6,7 @@
   "scripts": {
     "build": "npx webpack",
     "start": "node dist/src/index.js",
-    "dev": "npx webpack --mode development && NODE_ENV=development npm run start",
+    "dev": "npx webpack --watch --mode development & nodemon --watch dist --inspect dist/src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -36,9 +36,10 @@
     "eslint-plugin-node": "^8.0.1",
     "eslint-plugin-promise": "^4.0.1",
     "eslint-plugin-standard": "^4.0.0",
+    "nodemon": "^1.18.9",
     "serverless-webpack": "^5.2.0",
     "webpack": "^4.29.0",
-    "webpack-cli": "^3.2.1",
+    "webpack-cli": "^3.2.3",
     "webpack-node-externals": "^1.7.2"
   }
 }
